@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Convert Currencies</title>
+
+    <link href='http://fonts.googleapis.com/css?family=Merienda+One' rel='stylesheet' type='text/css'>
+
+    <style>
+
+        /* ----- Box -----*/
+
+        .box{
+            width:200px;
+            height:200px;
+            position:absolute;
+            background-color: chocolate;
+            box-shadow:1px 1px 20px;
+        }
+        .box_left_up{
+            left:0;
+            top:0;
+            border-bottom-right-radius:30%;
+        }
+        .box_left_down{
+            left:0;
+            bottom:0;
+            border-top-right-radius:30%;
+        }
+        .box_right_up{
+            right:0;
+            top:0;
+            border-bottom-left-radius:30%;
+        }
+        .box_right_down{
+            right:0;
+            bottom:0;
+            border-top-left-radius:30%;
+        }
+
+        /* ----- Loader -----*/
+
+        #loader_wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+        }
+        #loader {
+            position: relative;
+            left: 50%;
+            top: 50%;
+            width: 150px;
+            height: 150px;
+            margin: -75px 0 0 -75px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            border-top-color: #3498db;
+            border-bottom-color: #3498db;
+            -webkit-animation: spin 3s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
+            animation: spin 3s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
+        }
+
+        #loader:before {
+            content: "";
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            border-top-color: #e74c3c;
+            border-bottom-color: #e74c3c;
+            -webkit-animation: spin 4s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
+            animation: spin 4s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
+        }
+
+        #loader:after {
+            content: "";
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            border-top-color: #f9c922;
+            border-bottom-color: #f9c922;
+            -webkit-animation: spin 4.5s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
+            animation: spin 4.5s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
+        }
+
+        @-webkit-keyframes spin {
+            0%   {
+                -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+                -ms-transform: rotate(0deg);  /* IE 9 */
+                transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera */
+            }
+            100% {
+                -webkit-transform: rotate(360deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+                -ms-transform: rotate(360deg);  /* IE 9 */
+                transform: rotate(360deg);  /* Firefox 16+, IE 10+, Opera */
+            }
+        }
+        @keyframes spin {
+            0%   {
+                -webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+                -ms-transform: rotate(0deg);  /* IE 9 */
+                transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera */
+            }
+            100% {
+                -webkit-transform: rotate(360deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+                -ms-transform: rotate(360deg);  /* IE 9 */
+                transform: rotate(360deg);  /* Firefox 16+, IE 10+, Opera */
+            }
+        }
+
+        /* ----- curtain -----*/
+
+        .curtain{
+            opacity:0.1;
+        }
+
+        /* ----- converter -----*/
+
+        .converter{
+            width:500px;
+            height:500px;
+            position:absolute;
+            top:50%;
+            left:50%;
+            border-radius:25px;
+            transform: translate(-50%, -50%);
+        }
+
+        .content_wrapper{
+            padding:5px 5px 20px 5px;
+            background-color: #f0b325;
+            text-align: center;
+            border-radius:inherit;
+            box-shadow:1px 3px 20px;
+            font: 400 16px 'Merienda One', Helvetica, sans-serif;
+            color: rgba(0,0,0,0.7);
+        }
+
+        select.rate{
+            width:188px;
+            height:35px;
+            font:inherit;
+            font-size:14px;
+        }
+
+        select.rate:hover{
+            cursor:pointer;
+        }
+
+        .layout-result{
+            padding:10px 0;
+            position:absolute;
+            bottom:40%;
+            left:0;
+            border-radius:inherit;
+            background-color:inherit;
+            width:100%;
+            font-size:20px;
+            box-shadow:5px 3px 34px 3px rgba(0,0,0,0.5);
+        }
+
+        #update_note{
+            font-weight:400;
+        }
+
+        .submit > input{
+            font:inherit;
+            margin-top:15px;
+            height:30px;
+            width:90px;
+            border-radius:7px;
+            outline:none;
+            border-color:transparent !important;
+        }
+
+        .submit > input:hover {
+            cursor:pointer;
+            background-color:chocolate;
+            box-shadow:2px 2px 13px;
+        }
+
+        .submit > input:checked{
+            border:5px solid black;
+        }
+
+        #amount{
+            margin-top:10px;
+            padding:3px;
+            font:inherit;
+        }
+
+        .hide_element{
+            visibility: hidden;
+        }
+
+        @-webkit-keyframes blink {
+            from{font-weight:400;font-size:20px;}
+            to{font-weight:800;font-size:24px;}
+        }
+        @keyframes blink {
+            from{font-weight:400;font-size:20px;}
+            to{font-weight:800;font-size:24px;}
+        }
+
+        .result{
+            font-size:24px;
+            font-weight:800;
+            -webkit-animation: blink 3s linear; /* Chrome, Opera 15+, Safari 5+ */
+            animation: blink 3s linear; /* Chrome, Firefox 16+, IE 10+, Opera */
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="main curtain">
+    <div class="box box_left_up"></div>
+    <div class="box box_left_down"></div>
+    <div class="box box_right_up"></div>
+    <div class="box box_right_down"></div>
+
+    <div class="converter">
+        <div class="content_wrapper">
+
+            <h3 id="update_note">Updating...</h3>
+
+            <div class="layout_form">
+                <form action="" onsubmit="showResult();return false;">
+                    <div style="display:inline-block">
+                        <label>From:</label>
+                        <select required class="rate" id="from_rate">
+                            <option selected data-code="ISR" data-rate="1">NIS -> ISR</option>
+                        </select>
+                        <label>To:</label>
+                        <select required class="rate" id="to_rate">
+                            <option selected data-code="ISR" data-rate="1">NIS -> ISR</option>
+                        </select>
+
+                        <div></div>
+
+                        <input required id="amount" type="number" placeholder="Amount"/>
+                    </div>
+
+                    <div class="submit">
+                        <input type="submit" value="Convert">
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="layout-result">
+                Result:
+                <span id="result"></span>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+    <div id="loader_wrapper">
+        <div id="loader"></div>
+    </div>
+
+<script>
+
+    'use strict';
+
+    const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
+    const BANK_XML = 'http://www.boi.org.il/currency.xml';
+    const FIXED_DECIMAL_DIGIT = 3;
+    const XML_NODE_NAMES = {
+
+        LAST_UPDATE:'LAST_UPDATE',
+        CURRENCY_ROOT:'CURRENCY',
+        NAME:'NAME',
+        CURRENCYCODE:'CURRENCYCODE',
+        COUNTRY:'COUNTRY',
+        RATE:'RATE',
+        CHANGE:'CHANGE'
+    };
+
+    window.onload = function(){
+
+        let xmlHttp = new XMLHttpRequest();
+
+        xmlHttp.onreadystatechange = function() {
+
+            let self = this;
+
+            if (self.readyState === 4 && self.status === 200) {
+
+                let domP = new DOMParser();
+                let xmlDoc = domP.parseFromString(self.response, 'text/xml');
+
+                prepareConverter(xmlDoc);
+                hideBlockers();
+            }
+            else if(self.status === 404){
+                alert("There is no response from the server :(");
+                document.getElementById('update_note').innerText = 'No data available.';
+                hideBlockers();
+            }
+        };
+
+        // Initializes a request
+        xmlHttp.open("GET", CORS_PROXY + BANK_XML, true);
+
+        // Sends the request
+        xmlHttp.send();
+    };
+
+    function prepareConverter(xml){
+
+        let data = parseXMLToData(xml);
+
+        fillUI(data);
+    }
+
+    function parseXMLToData(xml){
+
+        let data = {};
+
+        data.lastUpdate = xml.getElementsByTagName(XML_NODE_NAMES.LAST_UPDATE)[0].innerHTML;
+        data.currencyArr = xml.getElementsByTagName(XML_NODE_NAMES.CURRENCY_ROOT);
+
+        return data;
+    }
+
+    function fillUI(data){
+
+        if(~data.lastUpdate.indexOf('-')){
+
+            data.lastUpdate = data.lastUpdate.split('-').reverse().join('-');
+        }
+
+        document.getElementById('update_note').innerText = 'Last update: ' + data.lastUpdate;
+
+        let toRate = document.getElementById('to_rate');
+        let fromRate = document.getElementById('from_rate');
+
+        for(let currency of data.currencyArr){
+
+            let obj = {};
+
+            for(let item of currency.children){
+
+                item = item.childNodes[0];
+
+                obj[item.parentElement.nodeName] = item.data;
+            }
+            createDOMOptionElement(obj, toRate);
+            createDOMOptionElement(obj, fromRate);
+        }
+    }
+
+    function createDOMOptionElement(obj, element){
+
+        let option = document.createElement('option');
+
+        option.text = obj[XML_NODE_NAMES.NAME] + ' -> ' + obj[XML_NODE_NAMES.COUNTRY];
+        option.setAttribute('data-code', obj[XML_NODE_NAMES.CURRENCYCODE]);
+        option.setAttribute('data-rate', obj[XML_NODE_NAMES.RATE]);
+        element.appendChild(option);
+    }
+
+    function showResult(){
+
+        let resultEle = document.getElementById('result');
+
+        resultEle.innerText = convertCurrencies().toFixed(FIXED_DECIMAL_DIGIT);
+        resultEle.className = 'result';
+    }
+
+    function convertCurrencies(){
+
+        let toRateDom = document.getElementById('to_rate');
+        let fromRateDom = document.getElementById('from_rate');
+        let amountDom = document.getElementById('amount');
+
+        if(toRateDom && fromRateDom){
+
+            let fromRateVal = fromRateDom.options[fromRateDom.selectedIndex].getAttribute('data-rate');
+            let toRateVal = toRateDom.options[toRateDom.selectedIndex].getAttribute('data-rate');
+            let amount = amountDom.value;
+
+            return calcAmount(parseFloat(fromRateVal),
+                parseFloat(toRateVal),
+                parseFloat(amount));
+        }
+        else{
+            throw new Error('Please fill in from and to currencies');
+        }
+
+        return;
+    }
+
+    function calcAmount(fromC, toC, amount){
+
+        if(!(isNaN(fromC) && isNaN(toC))){
+
+            let multiplication = 1, i = 0;
+
+            while(FIXED_DECIMAL_DIGIT > i++) multiplication += '0';
+
+            multiplication = parseInt(multiplication);
+
+            return (fromC/toC * amount * multiplication) / multiplication;
+        }
+    }
+
+    function hideBlockers(){
+
+        // Hide the loader element
+        document.getElementById('loader_wrapper').className = 'hide_element';
+
+        // remove curtain class from main
+        document.getElementsByClassName('main')[0].classList.remove('curtain');
+    }
+
+</script>
+
+</body>
+</html>
